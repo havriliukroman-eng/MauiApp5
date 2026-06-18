@@ -1,0 +1,66 @@
+﻿@page "/trading"
+@using MauiApp5.Shared.Services
+@inject TradingService TradingService
+@inject AppDbContext DbContext
+
+<h3>Обмін валют</h3>
+
+<div>
+    <label>User ID:</label>
+    <input type="number" @bind="UserId" />
+</div>
+
+<div>
+    <label>Old Currency :</label>
+    <input type="text" @bind="OldCurrency" />
+</div>
+
+<div>
+    <label>New Currency :</label>
+    <input type="text" @bind="NewCurrency" />
+</div>
+
+<div>
+    <label>Value:</label>
+    <input type="number" @bind="Value" />
+</div>
+
+<br />
+
+<button @onclick="Trade">Обміняти</button>
+
+@if (!string.IsNullOrEmpty(Message))
+{
+    <p>@Message</p>
+}
+
+@code {
+    int UserId = 1;
+    string OldCurrency = "dollar";
+    string NewCurrency = "grivna";
+    decimal Value = 10;
+
+string Message;
+
+    private void Trade()
+    {
+        var result = TradingService.Trading(
+            UserId,
+            Value,
+            GetCurrencyId(NewCurrency),
+            GetCurrencyId(OldCurrency)
+        );
+
+        Message = result ? "Успішно!" : "Помилка обміну";
+    }
+
+    int GetCurrencyId(string name)
+    {
+        var currency = DbContext.Currencys
+            .FirstOrDefault(c => c.Name.ToLower() == name.ToLower());
+
+        return currency?.CurrencyId ?? 0;
+    }
+
+}
+

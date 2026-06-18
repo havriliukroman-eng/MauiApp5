@@ -1,0 +1,58 @@
+﻿@page "/change-currency"
+@using MauiApp5.Shared.Services
+@inject IChangeCurrency ChangeCurrencyService
+
+<h3>Change Currency</h3>
+
+<div>
+    <label>Old Currency:</label>
+    <input type="text" @bind="OldCurrency" />
+</div>
+
+<div>
+    <label>New Currency:</label>
+    <input type="text" @bind="NewCurrency" />
+</div>
+
+<div>
+    <label>Value:</label>
+    <input type="number" @bind="Value" />
+</div>
+
+<br />
+
+<button @onclick="ChangeRate">Змінити курс</button>
+
+@if (!string.IsNullOrWhiteSpace(Message))
+{
+    <p>@Message</p>
+}
+
+@code {
+    private string OldCurrency = "dollar";
+    private string NewCurrency = "grivna";
+    private decimal Value = 10;
+    private string Message = "";
+
+    private void ChangeRate()
+    {
+        var result = ChangeCurrencyService.ChangeRate(
+    GetCurrencyId(OldCurrency),
+    GetCurrencyId(NewCurrency),
+    (double)Value
+);
+
+        Message = result ? "Успішно!" : "Помилка обміну";
+    }
+
+    private int GetCurrencyId(string currency)
+    {
+        return currency.ToLower() switch
+        {
+            "dollar" => 1,
+            "euro" => 2,
+            "grivna" => 3,
+            _ => 0
+        };
+    }
+}
